@@ -554,9 +554,11 @@ footer{padding:64px 48px 32px}
   .hero-ctas{gap:12px}
   .btn-primary,.btn-secondary{padding:14px 22px;font-size:11px;width:100%;justify-content:center}
   .hero-visual{
-    aspect-ratio:4/3.2;
-    max-height:52vw;
-    min-height:220px;
+    aspect-ratio:unset;
+    height:65vw;
+    min-height:280px;
+    max-height:420px;
+    width:100%;
   }
   .hero-visual-card{padding:12px 14px}
   .hero-visual-name{font-size:16px}
@@ -696,7 +698,7 @@ footer{padding:64px 48px 32px}
       <canvas id="model-canvas"></canvas>
       <div id="model-loader">
         <span>loading model</span>
-        <div id="model-loader-bar"></div>
+      <div id="model-loader-bar" style="width:120px;height:1px;background:var(--rule);transition:background .1s linear"></div>
       </div>
       <div class="hero-visual-tag">3D · Drag to Rotate</div>
       <div class="hero-visual-card">
@@ -1507,21 +1509,31 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
 <script type="module">
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const canvas = document.getElementById('model-canvas');
 const loaderEl = document.getElementById('model-loader');
+const loaderBar = document.getElementById('model-loader-bar');
+const loaderSpan = loaderEl?.querySelector('span');
 if (!canvas) throw new Error('no canvas');
 
-// ── Renderer ──
-const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(canvas.clientWidth || 600, canvas.clientHeight || 600);
+const isMobile = window.innerWidth <= 700 || ('ontouchstart' in window);
+
+// ── Renderer — lower pixel ratio on mobile saves significant GPU work ──
+const renderer = new THREE.WebGLRenderer({
+  canvas,
+  antialias: !isMobile,   // skip MSAA on mobile (big perf win)
+  alpha: true,
+  powerPreference: 'high-performance',
+});
+renderer.setPixelRatio(isMobile ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));
+renderer.setSize(canvas.clientWidth || 600, canvas.clientHeight || 500);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.3;
-renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+// Shadows are expensive on mobile — skip them until after model loads, then enable on desktop
+renderer.shadowMap.enabled = false;
 
 // ── Scene ──
 const scene = new THREE.Scene();
@@ -1529,25 +1541,18 @@ const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100);
 camera.position.set(0, 0.5, 2.8);
 
 // ── Lights ──
-const ambient = new THREE.AmbientLight(0xffffff, 1.3);
-scene.add(ambient);
+scene.add(new THREE.AmbientLight(0xffffff, 1.3));
 
 const key = new THREE.DirectionalLight(0xffffff, 2.5);
 key.position.set(2, 4, 3);
-key.castShadow = true;
 scene.add(key);
 
 const fill = new THREE.DirectionalLight(0xffffff, 1.4);
 fill.position.set(-3, 1, -1);
 scene.add(fill);
 
-const rim = new THREE.DirectionalLight(0xffffff, 0.8);
-rim.position.set(0, 3, -4);
-scene.add(rim);
-
-const under = new THREE.DirectionalLight(0xffffff, 0.5);
-under.position.set(0, -3, 2);
-scene.add(under);
+scene.add(Object.assign(new THREE.DirectionalLight(0xffffff, 0.8), { position: new THREE.Vector3(0, 3, -4) }));
+scene.add(Object.assign(new THREE.DirectionalLight(0xffffff, 0.5), { position: new THREE.Vector3(0, -3, 2) }));
 
 // ── Controls ──
 const controls = new OrbitControls(camera, canvas);
@@ -1561,13 +1566,26 @@ controls.maxPolarAngle = Math.PI * 0.82;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.7;
 
-// ── Stop auto-rotate on drag, resume on release ──
 canvas.addEventListener('pointerdown', () => { controls.autoRotate = false; });
-canvas.addEventListener('pointerup', () => { controls.autoRotate = true; });
-canvas.addEventListener('pointerleave', () => { controls.autoRotate = true; });
+canvas.addEventListener('pointerup',   () => { controls.autoRotate = true; });
+canvas.addEventListener('pointerleave',() => { controls.autoRotate = true; });
 
-// ── Load GLB ──
+// ── Loader — Draco decoder for compressed GLBs ──
+const dracoLoader = new DRACOLoader();
+dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/libs/draco/');
+dracoLoader.preload(); // start fetching the wasm decoder immediately
+
 const loader = new GLTFLoader();
+loader.setDRACOLoader(dracoLoader);
+
+// ── Progress bar ──
+function setProgress(pct) {
+  if (loaderBar) loaderBar.style.background =
+    `linear-gradient(90deg, var(--emerald) ${pct}%, var(--rule) ${pct}%)`;
+  if (loaderSpan) loaderSpan.textContent = pct < 100 ? `loading model — ${pct}%` : 'preparing…';
+}
+setProgress(0);
+
 loader.load(
   'https://files.prismpcs.mikaelsyed.me/pc.glb',
   (gltf) => {
@@ -1576,33 +1594,41 @@ loader.load(
     // Centre + fit model
     const box = new THREE.Box3().setFromObject(model);
     const centre = box.getCenter(new THREE.Vector3());
-    const size = box.getSize(new THREE.Vector3());
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const scale = 1.6 / maxDim;
+    const size   = box.getSize(new THREE.Vector3());
+    const scale  = 1.6 / Math.max(size.x, size.y, size.z);
     model.scale.setScalar(scale);
     model.position.sub(centre.multiplyScalar(scale));
 
-    // Cast + receive shadows, tweak materials
     model.traverse(child => {
-      if (child.isMesh) {
+      if (!child.isMesh) return;
+      if (!isMobile) {
+        // Enable shadows on desktop after load
         child.castShadow = true;
         child.receiveShadow = true;
-        if (child.material) {
-          child.material.envMapIntensity = 1.2;
-        }
       }
+      if (child.material) child.material.envMapIntensity = 1.2;
     });
 
+    // Enable shadows on desktop now that model is ready
+    if (!isMobile) {
+      renderer.shadowMap.enabled = true;
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+      key.castShadow = true;
+    }
+
     scene.add(model);
+    setProgress(100);
     loaderEl.style.opacity = '0';
     setTimeout(() => { loaderEl.style.display = 'none'; }, 500);
   },
   (xhr) => {
-    // progress — optional
+    if (xhr.lengthComputable) {
+      setProgress(Math.round((xhr.loaded / xhr.total) * 100));
+    }
   },
   (err) => {
     console.error('GLB load error', err);
-    loaderEl.querySelector('span').textContent = 'model unavailable';
+    if (loaderSpan) loaderSpan.textContent = 'model unavailable';
   }
 );
 
@@ -1616,9 +1642,13 @@ const ro = new ResizeObserver(() => {
 });
 ro.observe(canvas);
 
-// ── Render loop ──
-(function frame() {
+// ── Render loop — throttle to 30fps on mobile to save battery ──
+let lastTime = 0;
+const targetInterval = isMobile ? 1000 / 30 : 0;
+(function frame(now) {
   requestAnimationFrame(frame);
+  if (now - lastTime < targetInterval) return;
+  lastTime = now;
   controls.update();
   renderer.render(scene, camera);
 })();
