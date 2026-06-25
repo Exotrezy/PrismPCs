@@ -123,7 +123,7 @@ nav.scrolled{background:rgba(7,10,8,.82);backdrop-filter:blur(18px);border-color
   background:radial-gradient(ellipse 60% 70% at 78% 45%,rgba(52,211,153,.07),transparent 60%);
 }
 .hero-wrap{
-  display:grid;grid-template-columns:1fr 1fr;gap:clamp(32px,5vw,80px);align-items:center;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;
   width:100%;position:relative;z-index:2;
 }
 .hero-grid{display:grid;grid-template-columns:1fr;max-width:640px}
@@ -189,10 +189,10 @@ nav.scrolled{background:rgba(7,10,8,.82);backdrop-filter:blur(18px);border-color
 
 /* hero visual panel */
 .hero-visual{
-  position:relative;border:1px solid var(--rule);border-radius:4px;
+  position:relative;aspect-ratio:4/3.4;border:1px solid var(--rule);border-radius:4px;
   overflow:hidden;background:radial-gradient(circle at 50% 30%,rgba(52,211,153,.08),transparent 65%),var(--panel);
   opacity:0;animation:up .8s .3s forwards;
-  height:clamp(420px,calc(100svh - 240px),820px);width:100%;
+  max-height:calc(100svh - 280px);
 }
 .hero-visual canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab}
 .hero-visual canvas:active{cursor:grabbing}
@@ -491,149 +491,128 @@ footer{padding:64px 48px 32px}
 .footer-socials svg{width:13px;height:13px;fill:currentColor}
 
 /* ═══ MOBILE NAV ═══ */
-.mobile-toggle{display:none;flex-direction:column;gap:5px;width:24px;cursor:pointer;background:none;border:none;padding:4px 0}
-.mobile-toggle span{height:1px;background:var(--fg);transition:transform .3s,opacity .3s;display:block}
-.mobile-toggle.open span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-.mobile-toggle.open span:nth-child(2){opacity:0}
-.mobile-toggle.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+.mobile-toggle{display:none;flex-direction:column;gap:5px;width:24px;cursor:pointer;background:none;border:none}
+.mobile-toggle span{height:1px;background:var(--fg);transition:transform .3s,opacity .3s}
 
-/* mobile nav drawer */
-.nav-drawer{
-  display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:400;
-  background:rgba(7,10,8,.97);backdrop-filter:blur(20px);
-  flex-direction:column;align-items:center;justify-content:center;gap:40px;
-  opacity:0;transition:opacity .3s ease;pointer-events:none;
-}
-.nav-drawer.open{opacity:1;pointer-events:all}
-.nav-drawer .nav-link{
-  font-family:var(--display);font-size:28px;font-weight:500;color:var(--sub);
-  letter-spacing:-.01em;text-transform:none;
-}
-.nav-drawer .nav-link:hover{color:var(--fg)}
-.nav-drawer .nav-link::after{bottom:-8px}
-.nav-drawer .nav-cta{font-size:13px;padding:14px 36px;margin-top:8px}
-
-/* ═══ LAPTOP / TABLET (hero stays 2-col, other grids adapt) ═══ */
-@media(max-width:1100px){
-  /* Slightly reduce padding on laptop so model has more horizontal room */
-  #hero{padding:120px 32px 80px}
-  nav{padding:20px 32px}
-  nav.scrolled{padding:14px 32px}
-  .section{padding:120px 32px}
-  .cta-band{padding:120px 32px}
-  footer{padding:64px 32px 32px}
-}
-
+/* ═══ MOBILE ═══ */
+/* ═══ TABLET (≤980px) ═══ */
 @media(max-width:980px){
-  /* Keep hero 2-column down to 860px — model stays visible */
+  .hero-wrap{grid-template-columns:1fr;gap:40px}
+  .hero-grid{max-width:none}
+  .hero-title{font-size:clamp(38px,7vw,72px)}
+  .hero-visual{aspect-ratio:16/9;max-width:100%;max-height:none}
   .tier-rail{grid-template-columns:1fr}
   .stat-strip{grid-template-columns:repeat(2,1fr)}
+  .stat-cell{padding:28px 24px}
   .stat-cell:nth-child(2){border-right:none}
   .stat-cell:nth-child(3),.stat-cell:nth-child(4){border-top:1px solid var(--rule)}
   .howit-rail{grid-template-columns:1fr}
-  .howit-step{border-right:none;border-bottom:1px solid var(--rule);padding-bottom:32px}
+  .howit-step{border-right:none;border-bottom:1px solid var(--rule);padding:24px 0 24px;padding-left:0}
   .howit-step:last-child{border-bottom:none}
-  .config-wrap{grid-template-columns:1fr;gap:48px}
   .showcase-grid{grid-template-columns:1fr}
-  .process-rail{grid-template-columns:1fr}
-  .process-step{border-right:none;border-bottom:1px solid var(--rule);padding-bottom:32px}
-  .process-step:last-child{border-bottom:none}
+  .process-rail{grid-template-columns:1fr 1fr}
+  .process-step{border-right:none;border-bottom:1px solid var(--rule);padding:24px 0 24px}
+  .process-step:nth-child(odd){border-right:1px solid var(--rule);padding-right:24px}
+  .process-step:nth-last-child(-n+2){border-bottom:none}
   .footer-grid{grid-template-columns:1fr 1fr;gap:36px}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:16px}
+  .sec-sub{max-width:100%}
+  .part-row{grid-template-columns:1fr;gap:14px}
 }
 
-/* Hero stacks only below 860px — gives model proper space on laptop */
-@media(max-width:860px){
-  #hero{padding:110px 28px 160px;align-items:flex-start;padding-top:120px}
-  .hero-wrap{grid-template-columns:1fr;gap:36px}
-  .hero-grid{max-width:100%}
-  .hero-title{font-size:clamp(44px,9vw,72px)}
-  .hero-visual{height:clamp(360px,60vw,540px);width:100%}
-}
-
-/* ═══ MOBILE ═══ */
+/* ═══ MOBILE (≤700px) ═══ */
 @media(max-width:700px){
   /* nav */
-  nav{padding:18px 20px}
+  nav{padding:16px 20px}
   nav.scrolled{padding:14px 20px}
   .nav-links{display:none}
+  .nav-cta{display:none}
   .mobile-toggle{display:flex}
-  .nav-cta{display:none} /* shown in drawer instead */
-  .nav-drawer{display:flex}
 
   /* hero */
-  #hero{padding:90px 20px 140px;min-height:100svh;align-items:flex-start;padding-top:100px}
-  .hero-wrap{grid-template-columns:1fr;gap:28px}
+  #hero{padding:100px 20px 140px;min-height:100svh}
+  .hero-wrap{grid-template-columns:1fr;gap:32px}
   .hero-grid{max-width:100%}
-  .hero-title{font-size:clamp(34px,10vw,52px);margin-bottom:18px}
-  .hero-bio{font-size:15px;margin-bottom:28px;max-width:100%}
-  .hero-eye{margin-bottom:20px}
-  .hero-ctas{gap:12px}
-  .btn-primary,.btn-secondary{padding:14px 22px;font-size:11px;width:100%;justify-content:center}
-  .hero-visual{
-    height:clamp(260px,80vw,440px);
-    width:100%;
-  }
-  .hero-visual-card{padding:12px 14px}
+  .hero-title{font-size:clamp(36px,10vw,52px);letter-spacing:-.02em}
+  .hero-bio{font-size:15px;margin-bottom:32px;max-width:100%}
+  .hero-ctas{flex-direction:column;gap:10px}
+  .btn-primary,.btn-secondary{width:100%;justify-content:center;padding:15px 24px}
+  .hero-visual{aspect-ratio:4/3;max-height:280px}
+  .hero-visual-card{padding:14px 16px}
   .hero-visual-name{font-size:16px}
   .hero-visual-price b{font-size:18px}
-  .hero-visual-tag{font-size:9px;padding:4px 9px}
-  .hero-meta{
-    left:20px;right:20px;bottom:20px;
-    flex-direction:column;align-items:flex-start;gap:14px;
-  }
+  .hero-visual-tag{font-size:9px;padding:5px 10px}
+  .hero-meta{left:20px;right:20px;bottom:20px;flex-direction:column;align-items:flex-start;gap:14px}
   .hero-specs-mini{gap:20px;flex-wrap:wrap}
   .hero-specs-mini b{font-size:15px}
 
   /* sections */
-  .section{padding:64px 20px}
-  .section.tight{padding-top:56px;padding-bottom:56px}
-  .sec-head{margin-bottom:40px;gap:16px}
-  .sec-title{font-size:clamp(24px,7vw,36px)}
-  .sec-sub{max-width:100%;font-size:14px}
+  .section{padding:60px 20px}
+  .section.tight{padding-top:48px;padding-bottom:48px}
+  .sec-head{flex-direction:column;align-items:flex-start;gap:14px;margin-bottom:36px}
+  .sec-title{font-size:clamp(22px,6vw,32px)}
+  .sec-sub{font-size:14px;max-width:100%}
+  .sec-label{font-size:10px}
 
   /* tiers */
+  .tier-rail{grid-template-columns:1fr}
   .tier-card{padding:0 20px 28px}
   .tier-thumb{margin:0 -20px}
   .tier-name{font-size:20px}
   .tier-price b{font-size:26px}
+  .tier-spec-row{grid-template-columns:52px 1fr;gap:10px;padding:11px 0}
 
   /* stats */
   .stat-strip{grid-template-columns:1fr 1fr}
-  .stat-cell{padding:24px 20px}
-  .stat-cell:nth-child(2){border-right:none}
+  .stat-cell{padding:24px 18px;border-right:none;border-bottom:1px solid var(--rule)}
+  .stat-cell:nth-child(odd){border-right:1px solid var(--rule)}
+  .stat-cell:nth-child(3),.stat-cell:nth-child(4){border-top:none}
   .stat-cell:nth-child(3),.stat-cell:nth-child(4){border-top:1px solid var(--rule)}
-  .stat-num{font-size:clamp(28px,8vw,42px)}
-  .stat-lbl{font-size:10px}
+  .stat-num{font-size:clamp(26px,8vw,40px)}
 
-  /* howit */
-  .howit-step{padding:24px 20px 24px}
-  .howit-num{font-size:32px;margin-bottom:12px}
+  /* how it works */
+  .howit-rail{grid-template-columns:1fr}
+  .howit-step{padding:24px 0;border-right:none;border-bottom:1px solid var(--rule)}
+  .howit-step:last-child{border-bottom:none}
+  .howit-num{font-size:30px;margin-bottom:12px}
   .howit-title{font-size:17px}
 
-  /* configurator */
-  .part-row{padding:16px 0;gap:10px}
-  .part-btn{min-width:0;padding:12px 14px}
+  /* configurator parts picker */
+  .parts-grid{gap:0}
+  .part-row{grid-template-columns:1fr;gap:12px;padding:16px 0}
+  .part-options{flex-direction:column;gap:8px}
+  .part-btn{min-width:0;width:100%;padding:12px 16px}
   .part-btn-name{font-size:13px}
-  .parts-summary{padding:20px;gap:16px}
+  .parts-summary{flex-direction:column;align-items:flex-start;gap:20px;padding:20px}
+  .parts-readout{gap:8px}
+  .parts-readout-chip{font-size:10px}
+  #parts-quote-btn{width:100%;justify-content:center}
+  .mobo-display{min-width:0;width:100%}
 
   /* showcase */
+  .showcase-grid{grid-template-columns:1fr}
   .showcase-item{padding:20px}
+  .showcase-name{font-size:15px}
 
   /* process */
-  .process-step{padding:24px 20px 24px}
+  .process-rail{grid-template-columns:1fr}
+  .process-step{padding:24px 0;border-right:none;border-bottom:1px solid var(--rule)}
+  .process-step:last-child{border-bottom:none}
   .process-title{font-size:16px}
 
   /* faq */
   .faq-q{font-size:15px;padding:20px 0}
 
-  /* cta band */
-  .cta-band{padding:80px 20px}
+  /* cta */
+  .cta-band{padding:72px 20px}
+  .cta-title{font-size:clamp(26px,7vw,40px)}
   .cta-sub{font-size:14px}
+  .cta-btns{flex-direction:column;gap:10px}
   .cta-btns .btn-primary,.cta-btns .btn-secondary{width:100%;justify-content:center}
 
   /* footer */
   footer{padding:48px 20px 24px}
-  .footer-grid{grid-template-columns:1fr;gap:32px}
+  .footer-grid{grid-template-columns:1fr;gap:28px}
   .footer-bottom{flex-direction:column;align-items:flex-start;gap:16px}
   .footer-desc{max-width:100%}
 }
@@ -682,15 +661,6 @@ footer{padding:64px 48px 32px}
   </div>
 </nav>
 
-<!-- MOBILE NAV DRAWER -->
-<div class="nav-drawer" id="navDrawer">
-  <a href="#builds" class="nav-link">Builds</a>
-  <a href="#configurator" class="nav-link">Configurator</a>
-  <a href="#work" class="nav-link">Our Builds</a>
-  <a href="#faq" class="nav-link">FAQ</a>
-  <a href="#contact" class="nav-cta">Get a Quote</a>
-</div>
-
 <!-- HERO -->
 <section id="hero">
   <div class="hero-wrap">
@@ -711,7 +681,7 @@ footer{padding:64px 48px 32px}
       <canvas id="model-canvas"></canvas>
       <div id="model-loader">
         <span>loading model</span>
-      <div id="model-loader-bar" style="width:120px;height:1px;background:var(--rule);transition:background .1s linear"></div>
+        <div id="model-loader-bar"></div>
       </div>
       <div class="hero-visual-tag">3D · Drag to Rotate</div>
       <div class="hero-visual-card">
@@ -1270,18 +1240,45 @@ window.addEventListener('scroll',()=>{
   nav.classList.toggle('scrolled',scrollY>40);
 },{passive:true});
 
-/* mobile menu — full-screen drawer */
+/* mobile menu */
 const mobileToggle=document.getElementById('mobileToggle');
-const navDrawer=document.getElementById('navDrawer');
-let drawerOpen=false;
-function setDrawer(open){
-  drawerOpen=open;
-  mobileToggle.classList.toggle('open',open);
-  navDrawer.classList.toggle('open',open);
-  document.body.style.overflow=open?'hidden':'';
+const navLinks=document.querySelector('.nav-links');
+let menuOpen=false;
+
+function openMenu(){
+  menuOpen=true;
+  navLinks.style.cssText='display:flex;flex-direction:column;position:fixed;top:56px;left:0;right:0;background:rgba(7,10,8,.97);backdrop-filter:blur(20px);padding:28px 20px 24px;gap:0;border-bottom:1px solid var(--rule);z-index:499';
+  // inject CTA into menu if not already there
+  if(!navLinks.querySelector('.mobile-menu-cta')){
+    const cta=document.createElement('a');
+    cta.href='#contact';cta.className='mobile-menu-cta btn-primary';
+    cta.style.cssText='margin-top:20px;border-top:1px solid var(--rule);padding-top:20px;justify-content:center;';
+    cta.textContent='Get a Quote →';
+    navLinks.appendChild(cta);
+  }
+  // style links for mobile menu
+  navLinks.querySelectorAll('.nav-link').forEach(l=>{
+    l.style.cssText='padding:16px 0;border-bottom:1px solid var(--rule);font-size:13px;';
+  });
+  // animate hamburger to X
+  const spans=mobileToggle.querySelectorAll('span');
+  spans[0].style.transform='translateY(6px) rotate(45deg)';
+  spans[1].style.opacity='0';
+  spans[2].style.transform='translateY(-6px) rotate(-45deg)';
 }
-mobileToggle?.addEventListener('click',()=>setDrawer(!drawerOpen));
-navDrawer?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>setDrawer(false)));
+
+function closeMenu(){
+  menuOpen=false;
+  navLinks.style.display='none';
+  navLinks.querySelectorAll('.nav-link').forEach(l=>l.style.cssText='');
+  const spans=mobileToggle.querySelectorAll('span');
+  spans[0].style.transform='';spans[1].style.opacity='';spans[2].style.transform='';
+}
+
+mobileToggle?.addEventListener('click',()=>{ menuOpen?closeMenu():openMenu(); });
+document.addEventListener('click',e=>{
+  if(menuOpen && !navLinks.contains(e.target) && !mobileToggle.contains(e.target)) closeMenu();
+});
 
 /* ══════════════════════════════════════════
    SCROLL REVEAL
@@ -1503,7 +1500,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
       if(target){
         e.preventDefault();
         target.scrollIntoView({behavior:'smooth',block:'start'});
-        if(drawerOpen) setDrawer(false);
+        if(navLinks && menuOpen && window.innerWidth<=700){
+          closeMenu();
+        }
       }
     }
   });
@@ -1526,26 +1525,17 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const canvas = document.getElementById('model-canvas');
 const loaderEl = document.getElementById('model-loader');
-const loaderBar = document.getElementById('model-loader-bar');
-const loaderSpan = loaderEl?.querySelector('span');
 if (!canvas) throw new Error('no canvas');
 
-const isMobile = window.innerWidth <= 700 || ('ontouchstart' in window);
-
 // ── Renderer ──
-const renderer = new THREE.WebGLRenderer({
-  canvas,
-  antialias: !isMobile,
-  alpha: true,
-  powerPreference: 'high-performance',
-});
-renderer.setPixelRatio(isMobile ? Math.min(devicePixelRatio, 1.5) : Math.min(devicePixelRatio, 2));
-renderer.setSize(canvas.clientWidth || 600, canvas.clientHeight || 500);
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(canvas.clientWidth || 600, canvas.clientHeight || 600);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.3;
-renderer.shadowMap.enabled = !isMobile;
-if (!isMobile) renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
 // ── Scene ──
 const scene = new THREE.Scene();
@@ -1553,11 +1543,12 @@ const camera = new THREE.PerspectiveCamera(38, 1, 0.01, 100);
 camera.position.set(0, 0.5, 2.8);
 
 // ── Lights ──
-scene.add(new THREE.AmbientLight(0xffffff, 1.3));
+const ambient = new THREE.AmbientLight(0xffffff, 1.3);
+scene.add(ambient);
 
 const key = new THREE.DirectionalLight(0xffffff, 2.5);
 key.position.set(2, 4, 3);
-key.castShadow = !isMobile;
+key.castShadow = true;
 scene.add(key);
 
 const fill = new THREE.DirectionalLight(0xffffff, 1.4);
@@ -1584,17 +1575,10 @@ controls.maxPolarAngle = Math.PI * 0.82;
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.7;
 
+// ── Stop auto-rotate on drag, resume on release ──
 canvas.addEventListener('pointerdown', () => { controls.autoRotate = false; });
-canvas.addEventListener('pointerup',   () => { controls.autoRotate = true; });
-canvas.addEventListener('pointerleave',() => { controls.autoRotate = true; });
-
-// ── Progress bar ──
-function setProgress(pct) {
-  if (loaderBar) loaderBar.style.background =
-    `linear-gradient(90deg, var(--emerald) ${pct}%, var(--rule) ${pct}%)`;
-  if (loaderSpan) loaderSpan.textContent = pct < 100 ? `loading — ${pct}%` : 'preparing…';
-}
-setProgress(0);
+canvas.addEventListener('pointerup', () => { controls.autoRotate = true; });
+canvas.addEventListener('pointerleave', () => { controls.autoRotate = true; });
 
 // ── Load GLB ──
 const loader = new GLTFLoader();
@@ -1603,33 +1587,36 @@ loader.load(
   (gltf) => {
     const model = gltf.scene;
 
+    // Centre + fit model
     const box = new THREE.Box3().setFromObject(model);
     const centre = box.getCenter(new THREE.Vector3());
-    const size   = box.getSize(new THREE.Vector3());
-    const scale  = 1.6 / Math.max(size.x, size.y, size.z);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale = 1.6 / maxDim;
     model.scale.setScalar(scale);
     model.position.sub(centre.multiplyScalar(scale));
 
+    // Cast + receive shadows, tweak materials
     model.traverse(child => {
-      if (!child.isMesh) return;
-      child.castShadow = !isMobile;
-      child.receiveShadow = !isMobile;
-      if (child.material) child.material.envMapIntensity = 1.2;
+      if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+        if (child.material) {
+          child.material.envMapIntensity = 1.2;
+        }
+      }
     });
 
     scene.add(model);
-    setProgress(100);
     loaderEl.style.opacity = '0';
     setTimeout(() => { loaderEl.style.display = 'none'; }, 500);
   },
   (xhr) => {
-    if (xhr.lengthComputable) {
-      setProgress(Math.round((xhr.loaded / xhr.total) * 100));
-    }
+    // progress — optional
   },
   (err) => {
     console.error('GLB load error', err);
-    if (loaderSpan) loaderSpan.textContent = 'model unavailable';
+    loaderEl.querySelector('span').textContent = 'model unavailable';
   }
 );
 
@@ -1643,13 +1630,9 @@ const ro = new ResizeObserver(() => {
 });
 ro.observe(canvas);
 
-// ── Render loop — throttle to 30fps on mobile ──
-let lastTime = 0;
-const targetInterval = isMobile ? 1000 / 30 : 0;
-(function frame(now) {
+// ── Render loop ──
+(function frame() {
   requestAnimationFrame(frame);
-  if (now - lastTime < targetInterval) return;
-  lastTime = now;
   controls.update();
   renderer.render(scene, camera);
 })();
